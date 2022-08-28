@@ -3,29 +3,29 @@ import { useState } from "react";
 import { BrowserRouter, Route, Switch, useNavigate } from "react-router-dom";
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
   async function authAttempt(e) {
     e.preventDefault();
-    let credentials = {
-      username,
+    let user = {
+      email,
       password,
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/login/",
-        credentials
-      );
+      const response = await axios.post("http://localhost:3000/login", {
+        user,
+      });
       const result = await response;
 
-      if (result.data) {
-        localStorage.setItem("jwt_token", result.data.jwt);
-        localStorage.setItem("user", JSON.stringify(result.data.user));
-        navigate("/getreminders");
+      if (!result.data.message) {
+        // localStorage.setItem("jwt_token", result.data.jwt);
+        localStorage.setItem("user", JSON.stringify(result.data.user.id));
+        localStorage.setItem("role", JSON.stringify(result.data.user.role));
+        navigate("/dashboard");
       }
     } catch (error) {
       console.log(error);
@@ -35,12 +35,12 @@ function Login() {
     <div>
       <h1>Login Here</h1>
       <form>
-        <label>Username</label>
+        <label>Email</label>
         <input
           type="text"
-          name="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         ></input>
         <label>Password</label>
         <input
